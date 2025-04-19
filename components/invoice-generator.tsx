@@ -12,6 +12,7 @@ import { PrintButton } from "@/components/print-button"
 import { DateTimePicker } from "@/components/date-time-picker"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
 
 export type Product = {
   id: string
@@ -50,6 +51,7 @@ export function InvoiceGenerator() {
     phone: "",
   })
   const [receiptDate, setReceiptDate] = useState<Date>(new Date())
+  const [showProductBorders, setShowProductBorders] = useState(false)
   const invoiceRef = useRef<HTMLDivElement>(null)
 
   const formattedDate = receiptDate.toLocaleDateString("en-GB", {
@@ -70,6 +72,13 @@ export function InvoiceGenerator() {
   const grandTotal = subtotal + gstAmount
 
   const orderNumber = Math.floor(10000 + Math.random() * 90000)
+  const generateNTN = () => {
+    const digits = () => Math.floor(10000000 + Math.random() * 90000000); // 8 digits
+    const last = Math.floor(Math.random() * 10); // 1 digit
+    return `${digits()}-${last}`;
+  };
+
+  const ntnNumber = generateNTN();
 
   const handleCompanyInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -85,7 +94,7 @@ export function InvoiceGenerator() {
         <CardContent className="p-4">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-xl font-bold">Receipt Generator</h1>
-            <PrintButton targetRef={invoiceRef} />
+            <PrintButton targetRef={invoiceRef} showProductBorders={showProductBorders} />
           </div>
 
           <div className="mb-4">
@@ -164,6 +173,13 @@ export function InvoiceGenerator() {
           </div>
 
           <div className="mb-4">
+            <div className="flex items-center space-x-2">
+              <Switch id="product-borders" checked={showProductBorders} onCheckedChange={setShowProductBorders} />
+              <Label htmlFor="product-borders">Show borders around products</Label>
+            </div>
+          </div>
+
+          <div className="mb-4">
             <ProductTable products={products} setProducts={setProducts} />
           </div>
 
@@ -188,12 +204,12 @@ export function InvoiceGenerator() {
               {companyInfo.welcomeText} {companyInfo.name || "Your Company"}
             </p>
             {logo && <img src={logo || "/placeholder.svg"} alt="Company Logo" className="h-16 mx-auto my-2" />}
+            <p className="text-xs">NTN: {ntnNumber}</p>
             <p>{companyInfo.location || "Company Location"}</p>
 
-            {/* Customer Details at top right */}
+            {/* Customer Details at top right - without title */}
             {(customerInfo.name || customerInfo.phone) && (
               <div className="text-right mt-2">
-                <p className="font-bold">Customer Detail</p>
                 <p>
                   {customerInfo.name} {customerInfo.phone && `(${customerInfo.phone})`}
                 </p>
@@ -207,28 +223,68 @@ export function InvoiceGenerator() {
             </div>
           </div>
 
-          {/* Divider */}
-          <div className="border-t border-b border-black py-1 mb-2">
-            <div className="flex justify-between text-xs">
-              <span>No # Item</span>
-              <span>Amount</span>
-            </div>
-          </div>
-
-          {/* Order Items */}
-          <div className="mb-4">
-            {products.map((product, index) => (
-              <div key={product.id} className="flex justify-between">
-                <span>
-                 {product.quantity} {product.name} 
-                </span>
-                <span>{product.total.toFixed(0)}</span>
+          {/* Products Table with or without borders */}
+          {showProductBorders ? (
+            <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "16px" }}>
+              <thead>
+                <tr>
+                  <th style={{ border: "1px solid #000", padding: "4px", textAlign: "center" }}>#</th>
+                  <th style={{ border: "1px solid #000", padding: "4px", textAlign: "left" }}>Description</th>
+                  <th style={{ border: "1px solid #000", padding: "4px", textAlign: "right" }}>Price</th>
+                  <th style={{ border: "1px solid #000", padding: "4px", textAlign: "center" }}>Qty</th>
+                  <th style={{ border: "1px solid #000", padding: "4px", textAlign: "right" }}>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map((product, index) => (
+                  <tr key={product.id}>
+                    <td style={{ border: "1px solid #000", padding: "4px", textAlign: "center" }}>{index + 1}</td>
+                    <td style={{ border: "1px solid #000", padding: "4px", textAlign: "left" }}>{product.name}</td>
+                    <td style={{ border: "1px solid #000", padding: "4px", textAlign: "right" }}>
+                      {product.price.toFixed(0)}
+                    </td>
+                    <td style={{ border: "1px solid #000", padding: "4px", textAlign: "center" }}>
+                      {product.quantity}
+                    </td>
+                    <td style={{ border: "1px solid #000", padding: "4px", textAlign: "right" }}>
+                      {product.total.toFixed(0)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div>
+              {/* Divider */}
+              <div className="border-t border-b border-black py-1 mb-2">
+                <div className="flex justify-between text-xs">
+                  <span>No # Item</span>
+                  <span>Amount</span>
+                </div>
               </div>
-            ))}
-          </div>
 
-          {/* Divider */}
-          <div className="border-t border-black mb-2"></div>
+              {/* Order Items without borders */}
+              <div className="mb-4">
+                {products.map((product, index) => (
+                  <div
+                    key={product.id}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <span>
+                    {product.quantity} {product.name} 
+                    </span>
+                    <span>{product.total.toFixed(0)}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-black mb-2"></div>
+            </div>
+          )}
 
           {/* Payment Summary */}
           <div className="flex flex-col items-end mb-4">
@@ -245,6 +301,36 @@ export function InvoiceGenerator() {
               <span>{grandTotal.toFixed(0)}</span>
             </div>
           </div>
+
+          {/* Images at the bottom - with no space between */}
+          <div style={{ display: "flex", marginBottom: "16px", gap: "0" }}>
+  <img
+    src="/images/fbr-logo.png"
+    alt="FBR Logo"
+    style={{
+      width: "50%",
+      maxHeight: "60px",
+      objectFit: "contain",
+      filter: "grayscale(100%)",
+      margin: 0,
+      padding: 0,
+      display: "block"
+    }}
+  />
+  <img
+    src="/images/qr-code.png"
+    alt="QR Code"
+    style={{
+      width: "50%",
+      maxHeight: "80px",
+      objectFit: "contain",
+      margin: 0,
+      padding: 0,
+      display: "block"
+    }}
+  />
+</div>
+
 
           {/* Thank You */}
           <div className="text-center mb-4">

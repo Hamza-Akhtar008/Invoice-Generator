@@ -6,9 +6,10 @@ import type { RefObject } from "react"
 
 interface PrintButtonProps {
   targetRef: RefObject<HTMLDivElement>
+  showProductBorders: boolean
 }
 
-export function PrintButton({ targetRef }: PrintButtonProps) {
+export function PrintButton({ targetRef, showProductBorders }: PrintButtonProps) {
   const handlePrint = () => {
     if (!targetRef.current) return
 
@@ -66,6 +67,9 @@ export function PrintButton({ targetRef }: PrintButtonProps) {
             .justify-between {
               justify-content: space-between;
             }
+            .items-center {
+              align-items: center;
+            }
             .items-end {
               align-items: flex-end;
             }
@@ -89,6 +93,15 @@ export function PrintButton({ targetRef }: PrintButtonProps) {
             }
             .flex-col {
               flex-direction: column;
+            }
+            table {
+              border-collapse: collapse;
+              width: 100%;
+            }
+            th, td {
+              border: 1px solid black;
+              padding: 4px;
+              text-align: left;
             }
             @media print {
               body {
