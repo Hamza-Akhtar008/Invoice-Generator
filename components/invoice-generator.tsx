@@ -35,6 +35,13 @@ export type CustomerInfo = {
   phone: string
 }
 
+export type ReceiptOptions = {
+  showProductBorders: boolean
+  showGst: boolean
+  showFbrLogo: boolean
+  showQrCode: boolean
+}
+
 export function InvoiceGenerator() {
   const [logo, setLogo] = useState<string | null>(null)
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo>({
@@ -51,7 +58,12 @@ export function InvoiceGenerator() {
     phone: "",
   })
   const [receiptDate, setReceiptDate] = useState<Date>(new Date())
-  const [showProductBorders, setShowProductBorders] = useState(false)
+  const [options, setOptions] = useState<ReceiptOptions>({
+    showProductBorders: false,
+    showGst: true,
+    showFbrLogo: true,
+    showQrCode: true,
+  })
   const invoiceRef = useRef<HTMLDivElement>(null)
 
   const formattedDate = receiptDate.toLocaleDateString("en-GB", {
@@ -68,17 +80,10 @@ export function InvoiceGenerator() {
 
   const subtotal = products.reduce((sum, product) => sum + product.total, 0)
   const gstRate = paymentMethod === "cash" ? 0.16 : 0.05
-  const gstAmount = subtotal * gstRate
+  const gstAmount = options.showGst ? subtotal * gstRate : 0
   const grandTotal = subtotal + gstAmount
 
   const orderNumber = Math.floor(10000 + Math.random() * 90000)
-  const generateNTN = () => {
-    const digits = () => Math.floor(10000000 + Math.random() * 90000000); // 8 digits
-    const last = Math.floor(Math.random() * 10); // 1 digit
-    return `${digits()}-${last}`;
-  };
-
-  const ntnNumber = generateNTN();
 
   const handleCompanyInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -88,13 +93,20 @@ export function InvoiceGenerator() {
     })
   }
 
+  const updateOption = (option: keyof ReceiptOptions, value: boolean) => {
+    setOptions({
+      ...options,
+      [option]: value,
+    })
+  }
+
   return (
     <div className="max-w-md mx-auto">
       <Card className="mb-6">
         <CardContent className="p-4">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-xl font-bold">Receipt Generator</h1>
-            <PrintButton targetRef={invoiceRef} showProductBorders={showProductBorders} />
+            <PrintButton targetRef={invoiceRef} options={options} />
           </div>
 
           <div className="mb-4">
@@ -173,9 +185,42 @@ export function InvoiceGenerator() {
           </div>
 
           <div className="mb-4">
-            <div className="flex items-center space-x-2">
-              <Switch id="product-borders" checked={showProductBorders} onCheckedChange={setShowProductBorders} />
-              <Label htmlFor="product-borders">Show borders around products</Label>
+            <div className="space-y-2">
+              <h3 className="text-base font-medium">Receipt Options</h3>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="product-borders"
+                    checked={options.showProductBorders}
+                    onCheckedChange={(value) => updateOption("showProductBorders", value)}
+                  />
+                  <Label htmlFor="product-borders">Show borders around products</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="show-gst"
+                    checked={options.showGst}
+                    onCheckedChange={(value) => updateOption("showGst", value)}
+                  />
+                  <Label htmlFor="show-gst">Show GST calculation</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="show-fbr-logo"
+                    checked={options.showFbrLogo}
+                    onCheckedChange={(value) => updateOption("showFbrLogo", value)}
+                  />
+                  <Label htmlFor="show-fbr-logo">Show FBR logo</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="show-qr-code"
+                    checked={options.showQrCode}
+                    onCheckedChange={(value) => updateOption("showQrCode", value)}
+                  />
+                  <Label htmlFor="show-qr-code">Show QR code</Label>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -190,6 +235,7 @@ export function InvoiceGenerator() {
               setPaymentMethod={setPaymentMethod}
               gstAmount={gstAmount}
               grandTotal={grandTotal}
+              showGst={options.showGst}
             />
           </div>
         </CardContent>
@@ -197,14 +243,13 @@ export function InvoiceGenerator() {
 
       {/* Preview of the receipt */}
       <div ref={invoiceRef} className="hidden">
-        <div className="receipt-container font-mono text-sm max-w-md mx-auto bg-white p-4">
+        <div className="receipt-container font-mono text-md max-w-md mx-auto bg-white p-4">
           {/* Header */}
           <div className="text-center mb-4">
-            <p className="font-bold">
+            <p className="font-bold text-lg">
               {companyInfo.welcomeText} {companyInfo.name || "Your Company"}
             </p>
             {logo && <img src={logo || "/placeholder.svg"} alt="Company Logo" className="h-16 mx-auto my-2" />}
-            <p className="text-xs">NTN: {ntnNumber}</p>
             <p>{companyInfo.location || "Company Location"}</p>
 
             {/* Customer Details at top right - without title */}
@@ -224,8 +269,8 @@ export function InvoiceGenerator() {
           </div>
 
           {/* Products Table with or without borders */}
-          {showProductBorders ? (
-            <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "16px" }}>
+          {options.showProductBorders ? (
+            <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "16px", fontSize: "14px" }}>
               <thead>
                 <tr>
                   <th style={{ border: "1px solid #000", padding: "4px", textAlign: "center" }}>#</th>
@@ -254,10 +299,10 @@ export function InvoiceGenerator() {
               </tbody>
             </table>
           ) : (
-            <div>
+            <div style={{ fontSize: "14px" }}>
               {/* Divider */}
               <div className="border-t border-b border-black py-1 mb-2">
-                <div className="flex justify-between text-xs">
+                <div className="flex justify-between text-sm">
                   <span>No # Item</span>
                   <span>Amount</span>
                 </div>
@@ -271,10 +316,11 @@ export function InvoiceGenerator() {
                     style={{
                       display: "flex",
                       justifyContent: "space-between",
+                      marginBottom: "4px",
                     }}
                   >
                     <span>
-                    {product.quantity} {product.name} 
+                    {product.quantity} ×  {product.name} 
                     </span>
                     <span>{product.total.toFixed(0)}</span>
                   </div>
@@ -287,15 +333,17 @@ export function InvoiceGenerator() {
           )}
 
           {/* Payment Summary */}
-          <div className="flex flex-col items-end mb-4">
+          <div className="flex flex-col items-end mb-4" style={{ fontSize: "14px" }}>
             <div className="flex justify-between w-full">
               <span>Sub Total:</span>
               <span>{subtotal.toFixed(0)}</span>
             </div>
-            <div className="flex justify-between w-full">
-              <span>GST ({paymentMethod === "cash" ? "16%" : "5%"}):</span>
-              <span>{gstAmount.toFixed(0)}</span>
-            </div>
+            {options.showGst && (
+              <div className="flex justify-between w-full">
+                <span>GST ({paymentMethod === "cash" ? "16%" : "5%"}):</span>
+                <span>{gstAmount.toFixed(0)}</span>
+              </div>
+            )}
             <div className="flex justify-between w-full font-bold">
               <span>GRAND TOTAL:</span>
               <span>{grandTotal.toFixed(0)}</span>
@@ -303,43 +351,42 @@ export function InvoiceGenerator() {
           </div>
 
           {/* Images at the bottom - with no space between */}
-          <div style={{ display: "flex", marginBottom: "16px", gap: "0" }}>
-  <img
-    src="/images/fbr-logo.png"
-    alt="FBR Logo"
-    style={{
-      width: "50%",
-      maxHeight: "60px",
-      objectFit: "contain",
-      filter: "grayscale(100%)",
-      margin: 0,
-      padding: 0,
-      display: "block"
-    }}
-  />
-  <img
-    src="/images/qr-code.png"
-    alt="QR Code"
-    style={{
-      width: "50%",
-      maxHeight: "80px",
-      objectFit: "contain",
-      margin: 0,
-      padding: 0,
-      display: "block"
-    }}
-  />
-</div>
-
+          {(options.showFbrLogo || options.showQrCode) && (
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
+              {options.showFbrLogo && (
+                <img
+                  src="/images/fbr-logo.png"
+                  alt="FBR Logo"
+                  style={{
+                    width: options.showQrCode ? "45%" : "90%",
+                    maxHeight: "60px",
+                    objectFit: "contain",
+                    filter: "grayscale(100%)",
+                  }}
+                />
+              )}
+              {options.showQrCode && (
+                <img
+                  src="/images/qr-code.png"
+                  alt="QR Code"
+                  style={{
+                    width: options.showFbrLogo ? "45%" : "90%",
+                    maxHeight: "80px",
+                    objectFit: "contain",
+                  }}
+                />
+              )}
+            </div>
+          )}
 
           {/* Thank You */}
           <div className="text-center mb-4">
-            <p className="font-bold">{companyInfo.thankYouNote}</p>
-            <p className="text-xs mt-4">Powered By {companyInfo.name || "Your Company"}</p>
+            <p className="font-bold text-lg">{companyInfo.thankYouNote}</p>
+            <p className="text-sm mt-4">Powered By {companyInfo.name || "Your Company"}</p>
           </div>
 
           {/* Footer */}
-          <div className="text-center text-xs border-t border-black pt-2">
+          <div className="text-center text-sm border-t border-black pt-2">
             <p>Contact us: {companyInfo.phone || "Your Phone"}</p>
           </div>
         </div>

@@ -3,13 +3,14 @@
 import { Button } from "@/components/ui/button"
 import { Printer } from "lucide-react"
 import type { RefObject } from "react"
+import type { ReceiptOptions } from "./invoice-generator"
 
 interface PrintButtonProps {
   targetRef: RefObject<HTMLDivElement>
-  showProductBorders: boolean
+  options: ReceiptOptions
 }
 
-export function PrintButton({ targetRef, showProductBorders }: PrintButtonProps) {
+export function PrintButton({ targetRef, options }: PrintButtonProps) {
   const handlePrint = () => {
     if (!targetRef.current) return
 
@@ -30,8 +31,8 @@ export function PrintButton({ targetRef, showProductBorders }: PrintButtonProps)
               margin: 0;
               width: 80mm;
               max-width: 80mm;
-              font-size: 12px;
-              line-height: 1.2;
+              font-size: 14px;
+              line-height: 1.3;
             }
             .receipt-container {
               padding: 5mm;
@@ -40,7 +41,7 @@ export function PrintButton({ targetRef, showProductBorders }: PrintButtonProps)
               max-width: 60mm;
             }
             p {
-              margin: 2px 0;
+              margin: 3px 0;
             }
             .border-t {
               border-top: 1px solid black;
@@ -60,6 +61,15 @@ export function PrintButton({ targetRef, showProductBorders }: PrintButtonProps)
             }
             .font-bold {
               font-weight: bold;
+            }
+            .text-lg {
+              font-size: 16px;
+            }
+            .text-sm {
+              font-size: 12px;
+            }
+            .text-md {
+              font-size: 14px;
             }
             .flex {
               display: flex;
@@ -88,15 +98,13 @@ export function PrintButton({ targetRef, showProductBorders }: PrintButtonProps)
             .mt-4 {
               margin-top: 4mm;
             }
-            .text-xs {
-              font-size: 10px;
-            }
             .flex-col {
               flex-direction: column;
             }
             table {
               border-collapse: collapse;
               width: 100%;
+              font-size: 14px;
             }
             th, td {
               border: 1px solid black;

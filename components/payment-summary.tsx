@@ -9,6 +9,7 @@ interface PaymentSummaryProps {
   setPaymentMethod: (method: "cash" | "card") => void
   gstAmount: number
   grandTotal: number
+  showGst: boolean
 }
 
 export function PaymentSummary({
@@ -17,6 +18,7 @@ export function PaymentSummary({
   setPaymentMethod,
   gstAmount,
   grandTotal,
+  showGst,
 }: PaymentSummaryProps) {
   return (
     <div className="space-y-4">
@@ -40,10 +42,12 @@ export function PaymentSummary({
           <span>Subtotal:</span>
           <span>{subtotal.toFixed(0)}</span>
         </div>
-        <div className="flex justify-between py-1 text-sm">
-          <span>GST ({paymentMethod === "cash" ? "16%" : "5%"}):</span>
-          <span>{gstAmount.toFixed(0)}</span>
-        </div>
+        {showGst && (
+          <div className="flex justify-between py-1 text-sm">
+            <span>GST ({paymentMethod === "cash" ? "16%" : "5%"}):</span>
+            <span>{gstAmount.toFixed(0)}</span>
+          </div>
+        )}
         <div className="flex justify-between py-1 font-bold border-t pt-2 text-sm">
           <span>Grand Total:</span>
           <span>{grandTotal.toFixed(0)}</span>
