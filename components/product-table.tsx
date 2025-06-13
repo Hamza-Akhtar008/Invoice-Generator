@@ -8,9 +8,11 @@ import type { Product } from "./invoice-generator"
 interface ProductTableProps {
   products: Product[]
   setProducts: (products: Product[]) => void
+  showItemTax: boolean
+  taxPercentage: number
 }
 
-export function ProductTable({ products, setProducts }: ProductTableProps) {
+export function ProductTable({ products, setProducts, showItemTax, taxPercentage }: ProductTableProps) {
   const addProduct = () => {
     const newProduct: Product = {
       id: Date.now().toString(),
@@ -36,6 +38,11 @@ export function ProductTable({ products, setProducts }: ProductTableProps) {
         // Recalculate total whenever quantity or price changes
         if (field === "quantity" || field === "price") {
           updatedProduct.total = updatedProduct.quantity * updatedProduct.price
+
+          // Calculate tax if needed
+          if (showItemTax) {
+            updatedProduct.tax = (updatedProduct.total * taxPercentage) / 100
+          }
         }
 
         return updatedProduct
@@ -83,6 +90,11 @@ export function ProductTable({ products, setProducts }: ProductTableProps) {
                   placeholder="Price"
                   className="flex-1"
                 />
+                {showItemTax && (
+                  <div className="w-20 flex items-center justify-end text-sm text-gray-500">
+                    Tax: {((product.price * taxPercentage) / 100).toFixed(0)}
+                  </div>
+                )}
                 <div className="w-20 flex items-center justify-end font-medium text-sm">{product.total.toFixed(0)}</div>
               </div>
             </div>
