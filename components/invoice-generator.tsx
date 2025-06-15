@@ -417,7 +417,7 @@ export function InvoiceGenerator() {
       </Card>
 
       {/* Preview of the receipt */}
-      <div className="mb-10" ref={invoiceRef} >
+      <div  ref={invoiceRef} >
         <div
           className="receipt-container text-md max-w-md mx-auto bg-white p-4"
           style={{ fontFamily: options.fontFamily }}

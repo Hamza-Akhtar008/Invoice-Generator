@@ -19,119 +19,130 @@ export function PrintButton({ targetRef, options }: PrintButtonProps) {
 
     const content = targetRef.current.innerHTML
 
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Receipt</title>
-          <style>
-            body {
-              font-family: monospace;
-              padding: 0;
-              margin: 0;
-              width: 80mm;
-              max-width: 80mm;
-              font-size: 14px;
-              line-height: 1.3;
-            }
-            .receipt-container {
-              padding: 5mm;
-            }
-            img {
-              max-width: 60mm;
-            }
-            p {
-              margin: 3px 0;
-            }
-            .border-t {
-              border-top: 1px solid black;
-              padding-top: 2mm;
-              margin-top: 2mm;
-            }
-            .border-b {
-              border-bottom: 1px solid black;
-              padding-bottom: 2mm;
-              margin-bottom: 2mm;
-            }
-            .text-center {
-              text-align: center;
-            }
-            .text-right {
-              text-align: right;
-            }
-            .font-bold {
-              font-weight: bold;
-            }
-            .text-lg {
-              font-size: 16px;
-            }
-            .text-sm {
-              font-size: 12px;
-            }
-            .text-md {
-              font-size: 14px;
-            }
-            .flex {
-              display: flex;
-            }
-            .justify-between {
-              justify-content: space-between;
-            }
-            .items-center {
-              align-items: center;
-            }
-            .items-end {
-              align-items: flex-end;
-            }
-            .w-full {
-              width: 100%;
-            }
-            .mb-4 {
-              margin-bottom: 4mm;
-            }
-            .mb-2 {
-              margin-bottom: 2mm;
-            }
-            .mt-2 {
-              margin-top: 2mm;
-            }
-            .mt-4 {
-              margin-top: 4mm;
-            }
-            .flex-col {
-              flex-direction: column;
-            }
-            table {
-              border-collapse: collapse;
-              width: 100%;
-              font-size: 14px;
-            }
-            th, td {
-              border: 1px solid black;
-              padding: 4px;
-              text-align: left;
-            }
-            @media print {
-              body {
-                width: 80mm;
-                margin: 0;
-                padding: 0;
-              }
-            }
-          </style>
-        </head>
-        <body>
-          <div>${content}</div>
-          <div style="height: 30mm;"></div>
-          <script>
-            setTimeout(() => {
-              window.print();
-              window.close();
-            }, 500);
-          </script>
-        </body>
-      </html>
-    `)
+   printWindow.document.write(`
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>Receipt</title>
+      <style>
+        body {
+          font-family: monospace;
+          padding: 0;
+          margin: 0;
+          width: 80mm;
+          max-width: 80mm;
+          font-size: 14px;
+          line-height: 1.3;
+        }
+        .receipt-container {
+          padding: 5mm;
+        }
+        img {
+          max-width: 60mm;
+        }
+        p {
+          margin: 3px 0;
+        }
+        .border-t {
+          border-top: 1px solid black;
+          padding-top: 2mm;
+          margin-top: 2mm;
+        }
+        .border-b {
+          border-bottom: 1px solid black;
+          padding-bottom: 2mm;
+          margin-bottom: 2mm;
+        }
+        .text-center {
+          text-align: center;
+        }
+        .text-right {
+          text-align: right;
+        }
+        .font-bold {
+          font-weight: bold;
+        }
+        .text-lg {
+          font-size: 16px;
+        }
+        .text-sm {
+          font-size: 12px;
+        }
+        .text-md {
+          font-size: 14px;
+        }
+        .flex {
+          display: flex;
+        }
+        .justify-between {
+          justify-content: space-between;
+        }
+        .items-center {
+          align-items: center;
+        }
+        .items-end {
+          align-items: flex-end;
+        }
+        .w-full {
+          width: 100%;
+        }
+        .mb-4 {
+          margin-bottom: 4mm;
+        }
+        .mb-2 {
+          margin-bottom: 2mm;
+        }
+        .mt-2 {
+          margin-top: 2mm;
+        }
+        .mt-4 {
+          margin-top: 4mm;
+        }
+        .flex-col {
+          flex-direction: column;
+        }
+        table {
+          border-collapse: collapse;
+          width: 100%;
+          font-size: 14px;
+        }
+        th, td {
+          border: 1px solid black;
+          padding: 4px;
+          text-align: left;
+        }
+
+        @media print {
+          body {
+            width: 80mm;
+            margin: 0;
+            padding: 0;
+          }
+          body::after {
+            content: "";
+            display: block;
+            height: 60px;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <div ">
+        ${content}
+
+        <div style="height: 60px; width: 100%; display: block; background: white;">&nbsp;</div>
+      </div>
+
+      <script>
+        setTimeout(() => {
+          window.print();
+          window.close();
+        }, 500);
+      </script>
+    </body>
+  </html>
+`);
+
 
     printWindow.document.close()
   }
