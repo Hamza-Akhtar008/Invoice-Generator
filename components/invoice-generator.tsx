@@ -146,7 +146,7 @@ export function InvoiceGenerator() {
   }, [options.showItemTax, options.showGst, options.taxPercentage])
 
   return (
-    <div className="max-w-md mx-auto">
+    <div className="max-w-md mx-auto ">
       <Card className="mb-6">
         <CardContent className="p-4">
           <div className="flex justify-between items-center mb-6">
@@ -417,7 +417,7 @@ export function InvoiceGenerator() {
       </Card>
 
       {/* Preview of the receipt */}
-      <div ref={invoiceRef} className="hidden">
+      <div className="mb-10" ref={invoiceRef} >
         <div
           className="receipt-container text-md max-w-md mx-auto bg-white p-4"
           style={{ fontFamily: options.fontFamily }}
@@ -610,6 +610,7 @@ export function InvoiceGenerator() {
               <p>Contact us: {companyInfo.phone || "Your Phone"}</p>
             </div>
           )}
+       
         </div>
       </div>
     </div>

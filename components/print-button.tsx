@@ -122,6 +122,7 @@ export function PrintButton({ targetRef, options }: PrintButtonProps) {
         </head>
         <body>
           <div>${content}</div>
+          <div style="height: 30mm;"></div>
           <script>
             setTimeout(() => {
               window.print();
