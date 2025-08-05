@@ -92,10 +92,12 @@ export function ProductTable({ products, setProducts, showItemTax, taxPercentage
                 />
                 {showItemTax && (
                   <div className="w-20 flex items-center justify-end text-sm text-gray-500">
-                    Tax: {((product.price * taxPercentage) / 100).toFixed(0)}
+                    Tax: {((product.total * taxPercentage) / 100).toFixed(0)}
                   </div>
                 )}
-                <div className="w-20 flex items-center justify-end font-medium text-sm">{product.total.toFixed(0)}</div>
+                <div className="w-20 flex items-center justify-end font-medium text-sm">
+                  Total: {product.total.toFixed(0)}
+                </div>
               </div>
             </div>
             <Button
